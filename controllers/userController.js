@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
+import SerpApi from 'google-search-results-nodejs'
 
 const userRegister = asyncHandler(async (req, res) => {
   const { firstName, email, password } = req.body;
@@ -64,4 +65,34 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { userRegister, userLogin, getUserProfile };
+
+const getSearchGoogle = asyncHandler(async (req, res) => {
+  // req.user was set in authMiddleware.js
+ // const user = await User.findById(req.user._id);
+
+ let {body}= req;
+
+  let search = new SerpApi.GoogleSearch("b03da059d2f1aaa25a8f9f0dd1ff49ccc72408a669b77ca4881a793f44a58e6b")
+  console.log({})
+  let result = search.json({
+    q: body.keyword,            // search query
+    location: "Austin, TX", // location 
+   }, (data) => {
+     console.log(data)
+   })
+
+   res.json({result});
+
+  // if (user) {
+  //   res.json({
+  //     id: user._id,
+  //     firstName: user.firstName,
+  //     email: user.email,
+  //   });
+  // } else {
+  //   res.status(404);
+  //   throw new Error('User not found');
+  // }
+});
+
+export { userRegister, userLogin, getUserProfile, getSearchGoogle };
