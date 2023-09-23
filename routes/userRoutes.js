@@ -8,7 +8,10 @@ router.post('/register', userController.userRegister);
 router.post('/login', userController.userLogin);
 router.route('/profile').get(protect, userController.getUserProfile);
 router.post('/searchgoogle', userController.getSearchGoogle);
-// router.route('/searchgoogle').get( userController.getSearchGoogle);
-
+//products routes
+router.get("/products/:id", userController.getProducts);
+router.post("/products", userController.createProduct);
+router.get("/product/:id", userController.getProduct);
+router.delete("/products/:id", userController.deleteProduct);
 
 export default router;

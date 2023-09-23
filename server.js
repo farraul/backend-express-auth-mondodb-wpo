@@ -9,34 +9,26 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 const __dirname = path.resolve();
 
-// Deployment configuration
-//configure env file in dev mode
 dotenv.config();
 
-// configure env file in production
 if (process.env.NODE_ENV === undefined) {
   dotenv.config({ path: '../.env' });
 }
 
-// Connect to database
 connectDB();
 
 const app = express();
 
-// Body parser
 app.use(express.json());
 
-// CORS
 app.use(
   cors({
     origin: '*',
   }),
 );
 
-// API routes
 app.use('/api/user', userRoutes);
 
-// Middleware
 app.use(notFound);
 app.use(errorHandler);
 
