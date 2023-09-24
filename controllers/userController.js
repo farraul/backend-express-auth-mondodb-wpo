@@ -56,7 +56,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
   if (user) {
     res.json({
-      id: user._id,
+      _id: user._id,
       firstName: user.firstName,
       email: user.email,
     });
@@ -99,6 +99,9 @@ const getSearchGoogle = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   try {
+    console.log("id1: ",req )
+    console.log("id2: ",req.params)
+    console.log("id3: ",req.params.id )
     const products = await Product.find({ user: req.params.id })
     res.json(products);
   } catch (error) {
@@ -108,8 +111,9 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
-    const { title, description, brand, category, price, _id: id } = await req.body;
-    const user = await User.findById(id);
+    console.log(req.body)
+    const { title, description, brand, category, price, _id } = await req.body;
+    const user = await User.findById(_id);
     if (user) {
       const newProduct = new Product({
         title,
@@ -130,6 +134,7 @@ const createProduct = asyncHandler(async (req, res) => {
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    console.log("dd",req.params)
     if (!deletedProduct)
       return res.status(404).json({ message: "Product not found" });
 
@@ -141,8 +146,8 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const getProduct = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    console.log(req.params.id)
+    const product = await Product.findById(req.params._id);
+    console.log(req.params._id)
     if (!product) return res.status(404).json({ message: "Product not found" });
     return res.json(product);
   } catch (error) {
