@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import Product from "../models/productModel.js";
+import Seo from '../models/urlSeoModel.js';
 import generateToken from '../utils/generateToken.js';
 import SerpApi from 'google-search-results-nodejs'
 
@@ -39,10 +40,13 @@ const userLogin = asyncHandler(async (req, res) => {
   // return user obj if their password matches
   if (user && (await user.matchPassword(password))) {
     res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      email: user.email,
-      userToken: generateToken(user._id),
+      data: {
+        _id: user._id,
+        firstName: user.firstName,
+        email: user.email,
+        userToken: generateToken(user._id),
+      },
+      message: "Te has logueado correctamente",
     });
   } else {
     res.status(401);
@@ -99,9 +103,7 @@ const getSearchGoogle = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   try {
-    console.log("id1: ",req )
-    console.log("id2: ",req.params)
-    console.log("id3: ",req.params.id )
+    console.log("req: ", req)
     const products = await Product.find({ user: req.params.id })
     res.json(products);
   } catch (error) {
@@ -134,7 +136,7 @@ const createProduct = asyncHandler(async (req, res) => {
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    console.log("dd",req.params)
+    console.log("dd", req.params)
     if (!deletedProduct)
       return res.status(404).json({ message: "Product not found" });
 
@@ -155,4 +157,40 @@ const getProduct = asyncHandler(async (req, res) => {
   }
 })
 
-export { userRegister, userLogin, getUserProfile, getSearchGoogle, getProduct, getProducts, createProduct, deleteProduct };
+const createUrlSeo = asyncHandler(async (req, res) => {
+  try {
+    console.log(req.body)
+    const { urlSeo, _id } = await req.body;
+
+    const user = await User.findById(_id);
+    if (user) {
+      const newUrl = new Seo({
+        user: user.id,
+        url: urlSeo,
+      });
+
+      await newUrl.save();
+      res.json(newUrl);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+
+const getUrlSeo = asyncHandler(async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const urls = await Seo.find({ user: _id})
+    res.json(urls);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+
+
+export { userRegister, userLogin, getUserProfile, getSearchGoogle, getProduct, getProducts, createProduct, deleteProduct, createUrlSeo, getUrlSeo };

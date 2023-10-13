@@ -13,5 +13,10 @@ router.get("/products/:id", userController.getProducts);
 router.post("/products", userController.createProduct);
 router.get("/product/:id", userController.getProduct);
 router.delete("/products/:id", userController.deleteProduct);
+//seo routes
+router.get("/seo", userController.getUrlSeo);
+router.post("/seo", userController.createUrlSeo);
+
+
 
 export default router;
