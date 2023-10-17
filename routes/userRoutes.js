@@ -11,10 +11,11 @@ router.post('/searchgoogle', userController.getSearchGoogle);
 //products routes
 router.get("/products/:id", userController.getProducts);
 router.post("/products", userController.createProduct);
+router.put("/product/:id", userController.updateProduct);
 router.get("/product/:id", userController.getProduct);
 router.delete("/products/:id", userController.deleteProduct);
 //seo routes
-router.get("/seo", userController.getUrlSeo);
+router.post("/seo", userController.getUrlSeo);
 router.post("/seo", userController.createUrlSeo);
 
 

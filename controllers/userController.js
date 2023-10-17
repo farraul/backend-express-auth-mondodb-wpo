@@ -103,7 +103,7 @@ const getSearchGoogle = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   try {
-    console.log("req: ", req)
+    console.log("req: ", req.params.id)
     const products = await Product.find({ user: req.params.id })
     res.json(products);
   } catch (error) {
@@ -114,8 +114,8 @@ const getProducts = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
   try {
     console.log(req.body)
-    const { title, description, brand, category, price, _id } = await req.body;
-    const user = await User.findById(_id);
+    const { title, description, brand, category, price, userId } = await req.body;
+    const user = await User.findById(userId);
     if (user) {
       const newProduct = new Product({
         title,
@@ -126,8 +126,9 @@ const createProduct = asyncHandler(async (req, res) => {
         user: user.id
       });
       await newProduct.save();
-      res.json(newProduct);
+      return res.json(newProduct);
     }
+    return res.status(404).json({});
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -136,7 +137,6 @@ const createProduct = asyncHandler(async (req, res) => {
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    console.log("dd", req.params)
     if (!deletedProduct)
       return res.status(404).json({ message: "Product not found" });
 
@@ -146,10 +146,27 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 })
 
-const getProduct = asyncHandler(async (req, res) => {
+const updateProduct = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params._id);
-    console.log(req.params._id)
+
+    const { title, description, brand, category, price, userId: user, _id } = await req.body;
+    const updatedProduct = await Product.findOneAndUpdate({ _id: _id }, { title, description, brand, category, price }, { new: true });
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Do not update", updatedProduct });
+    }
+    return res.sendStatus(204);
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+})
+
+
+const getProduct = asyncHandler(async (req, res) => {
+  console.log(req.body)
+  try {
+    const product = await Product.findOne({ _id: req.body._id });
     if (!product) return res.status(404).json({ message: "Product not found" });
     return res.json(product);
   } catch (error) {
@@ -159,7 +176,6 @@ const getProduct = asyncHandler(async (req, res) => {
 
 const createUrlSeo = asyncHandler(async (req, res) => {
   try {
-    console.log(req.body)
     const { urlSeo, _id } = await req.body;
 
     const user = await User.findById(_id);
@@ -177,11 +193,10 @@ const createUrlSeo = asyncHandler(async (req, res) => {
   }
 });
 
-
 const getUrlSeo = asyncHandler(async (req, res) => {
   const { _id } = req.body;
   try {
-    const urls = await Seo.find({ user: _id})
+    const urls = await Seo.find({ user: _id })
     res.json(urls);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -193,4 +208,4 @@ const getUrlSeo = asyncHandler(async (req, res) => {
 
 
 
-export { userRegister, userLogin, getUserProfile, getSearchGoogle, getProduct, getProducts, createProduct, deleteProduct, createUrlSeo, getUrlSeo };
+export { userRegister, userLogin, getUserProfile, getSearchGoogle, getProduct, getProducts, createProduct, updateProduct, deleteProduct, createUrlSeo, getUrlSeo };
