@@ -1,6 +1,8 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
 import * as userController from '../controllers/userController.js';
+import * as urlSeoController from '../controllers/urlSeoController.js';
+import * as clientController from '../controllers/clientController.js';
 
 const router = express.Router();
 
@@ -15,8 +17,13 @@ router.put("/product/:id", userController.updateProduct);
 router.get("/product/:id", userController.getProduct);
 router.delete("/products/:id", userController.deleteProduct);
 //seo routes
-router.post("/seo", userController.getUrlSeo);
-router.post("/seo", userController.createUrlSeo);
+router.get("/seo/:id", urlSeoController.getUrlSeo);
+router.post("/seo/", urlSeoController.createUrlSeo);
+
+//clients
+router.post("/clients", clientController.clientRegister);
+router.get("/clients/:id", clientController.getClients);
+
 
 
 

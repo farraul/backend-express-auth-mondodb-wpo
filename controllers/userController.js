@@ -1,9 +1,10 @@
-import asyncHandler from 'express-async-handler';
-import User from '../models/userModel.js';
+import asyncHandler from "express-async-handler";
+import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
-import Seo from '../models/urlSeoModel.js';
-import generateToken from '../utils/generateToken.js';
-import SerpApi from 'google-search-results-nodejs'
+import Seo from "../models/urlSeoModel.js";
+import generateToken from "../utils/generateToken.js";
+import SerpApi from "google-search-results-nodejs";
+import Client from "../models/clientModel.js";
 
 const userRegister = asyncHandler(async (req, res) => {
   const { firstName, email, password } = req.body;
@@ -13,7 +14,7 @@ const userRegister = asyncHandler(async (req, res) => {
 
   if (userExists) {
     res.status(404);
-    throw new Error('User already exists');
+    throw new Error("User already exists");
   }
 
   // create new user document in db
@@ -27,7 +28,7 @@ const userRegister = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error('Invalid user data');
+    throw new Error("Invalid user data");
   }
 });
 
@@ -50,7 +51,7 @@ const userLogin = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(401);
-    throw new Error('Invalid email or password');
+    throw new Error("Invalid email or password");
   }
 });
 
@@ -66,10 +67,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 });
-
 
 const getSearchGoogle = asyncHandler(async (req, res) => {
   // req.user was set in authMiddleware.js
@@ -77,14 +77,19 @@ const getSearchGoogle = asyncHandler(async (req, res) => {
 
   let { body } = req;
 
-  let search = new SerpApi.GoogleSearch("b03da059d2f1aaa25a8f9f0dd1ff49ccc72408a669b77ca4881a793f44a58e6b")
-  console.log({})
-  let result = search.json({
-    q: body.keyword,            // search query
-    location: "Austin, TX", // location 
-  }, (data) => {
-    console.log(data)
-  })
+  let search = new SerpApi.GoogleSearch(
+    "b03da059d2f1aaa25a8f9f0dd1ff49ccc72408a669b77ca4881a793f44a58e6b"
+  );
+  console.log({});
+  let result = search.json(
+    {
+      q: body.keyword, // search query
+      location: "Austin, TX", // location
+    },
+    (data) => {
+      console.log(data);
+    }
+  );
 
   res.json({ result });
 
@@ -100,21 +105,21 @@ const getSearchGoogle = asyncHandler(async (req, res) => {
   // }
 });
 
-
 const getProducts = asyncHandler(async (req, res) => {
   try {
-    console.log("req: ", req.params.id)
-    const products = await Product.find({ user: req.params.id })
+    console.log("req: ", req.params.id);
+    const products = await Product.find({ user: req.params.id });
     res.json(products);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-})
+});
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
-    console.log(req.body)
-    const { title, description, brand, category, price, userId } = await req.body;
+    console.log(req.body);
+    const { title, description, brand, category, price, userId } =
+      await req.body;
     const user = await User.findById(userId);
     if (user) {
       const newProduct = new Product({
@@ -123,7 +128,7 @@ const createProduct = asyncHandler(async (req, res) => {
         brand,
         category,
         price,
-        user: user.id
+        user: user.id,
       });
       await newProduct.save();
       return res.json(newProduct);
@@ -144,27 +149,36 @@ const deleteProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-})
+});
 
 const updateProduct = asyncHandler(async (req, res) => {
   try {
-
-    const { title, description, brand, category, price, userId: user, _id } = await req.body;
-    const updatedProduct = await Product.findOneAndUpdate({ _id: _id }, { title, description, brand, category, price }, { new: true });
+    const {
+      title,
+      description,
+      brand,
+      category,
+      price,
+      userId: user,
+      _id,
+    } = await req.body;
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: _id },
+      { title, description, brand, category, price },
+      { new: true }
+    );
 
     if (!updatedProduct) {
       return res.status(404).json({ message: "Do not update", updatedProduct });
     }
     return res.sendStatus(204);
-
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-})
-
+});
 
 const getProduct = asyncHandler(async (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   try {
     const product = await Product.findOne({ _id: req.body._id });
     if (!product) return res.status(404).json({ message: "Product not found" });
@@ -172,40 +186,18 @@ const getProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-})
-
-const createUrlSeo = asyncHandler(async (req, res) => {
-  try {
-    const { urlSeo, _id } = await req.body;
-
-    const user = await User.findById(_id);
-    if (user) {
-      const newUrl = new Seo({
-        user: user.id,
-        url: urlSeo,
-      });
-
-      await newUrl.save();
-      res.json(newUrl);
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-});
-
-const getUrlSeo = asyncHandler(async (req, res) => {
-  const { _id } = req.body;
-  try {
-    const urls = await Seo.find({ user: _id })
-    res.json(urls);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
 });
 
 
 
-
-
-
-export { userRegister, userLogin, getUserProfile, getSearchGoogle, getProduct, getProducts, createProduct, updateProduct, deleteProduct, createUrlSeo, getUrlSeo };
+export {
+  userRegister,
+  userLogin,
+  getUserProfile,
+  getSearchGoogle,
+  getProduct,
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
