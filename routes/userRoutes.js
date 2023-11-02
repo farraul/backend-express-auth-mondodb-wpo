@@ -21,8 +21,10 @@ router.get("/seo/:id", urlSeoController.getUrlSeo);
 router.post("/seo/", urlSeoController.createUrlSeo);
 
 //clients
-router.post("/clients", clientController.clientRegister);
 router.get("/clients/:id", clientController.getClients);
+router.post("/clients", clientController.clientRegister);
+router.put("/clients", clientController.updateClient);
+router.delete("/clients", clientController.deleteClient);
 
 
 

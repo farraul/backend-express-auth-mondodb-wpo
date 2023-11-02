@@ -48,5 +48,37 @@ const getClients = asyncHandler(async (req, res) => {
     throw new Error("Invalid client data");
   }
 });
+const updateClient = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  try {
+    const { name, email, url, status, tasks, description, contact, id } =
+      await req.body;
+    const updatedClient = await Client.findOneAndUpdate(
+      { _id: id },
+      { name, email, url, status, tasks, description, contact },
+      { new: true }
+    );
 
-export { clientRegister, getClients };
+    if (!updatedClient) {
+      return res.status(404).json({ message: "Do not update", updatedClient });
+    }
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+const deleteClient = asyncHandler(async (req, res) => {
+  const { id } = await res.body;
+  try {
+    const deletedClient = await Client.findByIdAndDelete(id);
+    if (!deletedClient)
+      return res.status(404).json({ message: "Client not found" });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+export { clientRegister, getClients, updateClient, deleteClient };

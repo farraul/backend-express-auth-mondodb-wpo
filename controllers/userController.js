@@ -159,7 +159,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       brand,
       category,
       price,
-      userId: user,
+      // userId: user,
       _id,
     } = await req.body;
     const updatedProduct = await Product.findOneAndUpdate(
