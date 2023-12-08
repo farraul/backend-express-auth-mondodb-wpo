@@ -36,7 +36,6 @@ const clientRegister = asyncHandler(async (req, res) => {
 });
 
 const getClients = asyncHandler(async (req, res) => {
-  console.log("req: ", req.params.id);
   const clients = await Client.find({ user: req.params.id });
   res.json(clients);
 
@@ -69,9 +68,10 @@ const updateClient = asyncHandler(async (req, res) => {
 });
 
 const deleteClient = asyncHandler(async (req, res) => {
-  const { id } = await res.body;
+  const { _id} = await req.body;
+
   try {
-    const deletedClient = await Client.findByIdAndDelete(id);
+    const deletedClient = await Client.findByIdAndDelete(_id);
     if (!deletedClient)
       return res.status(404).json({ message: "Client not found" });
 

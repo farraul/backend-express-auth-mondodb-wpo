@@ -19,8 +19,11 @@ const protect = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (error) {
+      // if(error.message=='jwt expired'){
+      //   throw new Error('jwt expired');
+      // }
       res.status(401);
-      throw new Error('Not authorized, invalid token');
+      throw new Error(error.message);
     }
   }
 

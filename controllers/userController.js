@@ -45,7 +45,7 @@ const userLogin = asyncHandler(async (req, res) => {
         _id: user._id,
         firstName: user.firstName,
         email: user.email,
-        userToken: generateToken(user._id),
+        token: generateToken(user._id),
       },
       message: "Te has logueado correctamente",
     });
@@ -57,9 +57,12 @@ const userLogin = asyncHandler(async (req, res) => {
 
 const getUserProfile = asyncHandler(async (req, res) => {
   // req.user was set in authMiddleware.js
+  console.log("___id:",req.user._id)
   const user = await User.findById(req.user._id);
+  console.log({user})
 
   if (user) {
+    console.log("good:", user)
     res.json({
       _id: user._id,
       firstName: user.firstName,

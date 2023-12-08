@@ -9,6 +9,8 @@ const router = express.Router();
 router.post('/register', userController.userRegister);
 router.post('/login', userController.userLogin);
 router.route('/profile').get(protect, userController.getUserProfile);
+
+// router.route('/profile').get(protect, userController.getUserProfile);
 router.post('/searchgoogle', userController.getSearchGoogle);
 //products routes
 router.get("/products/:id", userController.getProducts);
